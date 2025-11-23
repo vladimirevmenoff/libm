@@ -205,9 +205,8 @@ struct Binary128 {
              static_cast<unsigned __int128>(mant.w[0]);
 
         long double m = static_cast<long double>(m_int);
-        // m_scaled = mant / 2^112
-        long double m_scaled = std::ldexp(m, -FracBits);
-        long double x = std::ldexp(m_scaled, exponent);
+        // m_scaled = mant / 2^112 * 2^exponent = mant * 2^(-112 + exponent)
+        long double x = std::ldexp(m, -FracBits + exponent);
         return sign ? -x : x;
     }
 };
