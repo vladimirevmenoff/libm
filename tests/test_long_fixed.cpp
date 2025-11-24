@@ -145,7 +145,7 @@ MpReal mp_from_uint(const UInt<N>& u) {
     MpReal r;
     for (int i = static_cast<int>(N) - 1; i >= 0; --i) {
         mpfr_mul(r.raw(), r.raw(), base.raw(), MPFR_RNDN);
-        MpReal limb(u.w[static_cast<std::size_t>(i)]);
+        MpReal limb(static_cast<unsigned long long>(u.w[static_cast<std::size_t>(i)]));
         mpfr_add(r.raw(), r.raw(), limb.raw(), MPFR_RNDN);
     }
     return r;
