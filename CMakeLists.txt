@@ -34,7 +34,29 @@ target_link_libraries(test_long_fixed PRIVATE
     ${GMP_LIBRARIES}
 )
 
+add_executable(test_performance
+    tests/test_performance.cpp
+)
 
+target_include_directories(test_performance PRIVATE
+    ${PROJECT_INCLUDE_DIR}
+    ${PROJECT_ROOT}
+    ${MPFR_INCLUDE_DIRS}
+    ${GMP_INCLUDE_DIRS}
+)
+
+target_link_directories(test_performance PRIVATE
+    ${MPFR_LIBRARY_DIRS}
+    ${GMP_LIBRARY_DIRS}
+)
+
+target_link_libraries(test_performance PRIVATE
+    ${MPFR_LIBRARIES}
+    ${GMP_LIBRARIES}
+)
+
+if(NOT APPLE)
+    
 add_executable(test_long_fixed_quad
     tests/test_long_fixed_quad.cpp
 )
@@ -45,4 +67,6 @@ target_include_directories(test_long_fixed_quad PRIVATE
 )
 
 target_link_libraries(test_long_fixed_quad PRIVATE quadmath)
+
+endif()
 
