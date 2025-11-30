@@ -15,6 +15,7 @@ namespace longfixed {
 template<std::size_t N>
 struct UInt {
     // Little-endian limbs: w[0] is least significant 64 bits
+    // Don't forget that each w[i] is Big-Endian
     std::array<std::uint64_t, N> w{};
 
     static constexpr std::size_t bits() noexcept { return N * 64; }
@@ -77,8 +78,8 @@ using U256 = UInt<4>;
 // 2. Fixed-Point Tags + Wrapper Type (no arithmetic here)
 // ============================================================================
 
-struct TagSmall {};    // value = U / 2^(64*N)
-struct TagBig {};      // value = U / 2^(64*(N-1))
+struct TagSmall {};    // value = U / 2^(64*N), apply for small numbers
+struct TagBig {};      // value = U / 2^(64*(N-1)), apply for big numbers
 struct TagMantissa {}; // normalized ~[1,2) (reserved)
 
 template<typename Tag, std::size_t N>
@@ -250,7 +251,7 @@ inline Fixed<Tag, N> from_ldbl(long double x) noexcept {
     }
 
     UInt<N> res{};
-
+    // We just shift mantissa so we can look at x it as fixed point.
     if (shift >= 0) {
         const int word_shift = shift / 64;
         const int bit_shift  = shift % 64;
