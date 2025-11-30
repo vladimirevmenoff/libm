@@ -225,27 +225,28 @@ MpReal mod_2pow(const MpReal& x) {
 // Tests for UInt<N> arithmetic
 // ============================================================
 
+template<size_t N> 
 void test_uint_add_performance(std::mt19937_64& rng) {
     std::uniform_real_distribution<long double> dist(0.8L, 1.2L);
     
-    constexpr int N = 200000;
+    constexpr int size = 200000;
     constexpr int n_iters = 20;
     
-    std::vector<Fixed<TagSmall, 3>> fixed_nums(N);
-    std::vector<MpReal>             mp_fixed_nums(N);
-    for (int i = 0; i < N; ++i) {
+    std::vector<Fixed<TagSmall, N>> fixed_nums(size);
+    std::vector<MpReal>             mp_fixed_nums(size);
+    for (int i = 0; i < size; ++i) {
         long double val  = dist(rng);
-        fixed_nums[i]    = from_ldbl<TagSmall, 3>(val);
+        fixed_nums[i]    = from_ldbl<TagSmall, N>(val);
         mp_fixed_nums[i] = mp_from_fixed_small(fixed_nums[i]);
     }
 
     using namespace std::chrono;
 
     auto start = high_resolution_clock::now();
-    Fixed<TagSmall, 3> fprod;
+    Fixed<TagSmall, N> fprod;
     for (int iter = 0; iter < n_iters; ++iter) {
-        fprod = from_ldbl<TagSmall, 3>(1);
-        for (int t = 0; t < N; ++t) {
+        fprod = from_ldbl<TagSmall, N>(1);
+        for (int t = 0; t < size; ++t) {
             // MpReal mp_a = mp_from_fixed_small(fa);
             // MpReal mp_b = mp_from_fixed_small(fb);
 
@@ -265,13 +266,14 @@ void test_uint_add_performance(std::mt19937_64& rng) {
 
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
+    std::cout << "------ N = " << N << " ------" << std::endl;
     std::cout << "Our implementation: " << duration.count() / n_iters << " ms\n";
 
     MpReal mp_prod_ref(static_cast<long double>(1.0));
     start = high_resolution_clock::now();
     for (int iter = 0; iter < n_iters; ++iter) {
         mp_prod_ref = MpReal(static_cast<long double>(1.0));
-        for (int t = 0; t < N; ++t) {
+        for (int t = 0; t < size; ++t) {
             // long double ax = dist(mp_rng);
             // long double bx = dist(mp_rng);
 
@@ -309,10 +311,11 @@ void test_uint_add_performance(std::mt19937_64& rng) {
 
 int main() {
     try {
-        std::cout << "Testing Fixed<TagSmall,3> addition+multiplication performance..." << std::endl;
+        std::cout << "Testing Fixed<TagSmall,N> multiplication performance..." << std::endl;
         {
             std::mt19937_64 rng(123);
-            test_uint_add_performance(rng);
+            test_uint_add_performance<2>(rng);
+            test_uint_add_performance<3>(rng);
         }
 
         std::cout << "All tests PASSED." << std::endl;
